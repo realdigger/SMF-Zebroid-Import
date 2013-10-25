@@ -9,14 +9,14 @@
     <homepage>http://mysmf.ru</homepage>
 
     <install for="2.0 - 2.0.99">
-        <require-dir name="languages" destination="$themedir"/>
-        <require-file name="Sources/Mod-ZebrumImport.php" destination="$sourcedir"/>
+        <require-dir name="Themes" destination="$boarddir"/>
+        <require-dir name="Sources" destination="$boarddir"/>
         <code>hooks.php</code>
         <redirect url="?action=admin;area=modsettings;sa=zebrum_import"/>
     </install>
 
     <uninstall for="2.0 - 2.0.99">
-        <remove-dir name="$themedir/languages/ZebrumImport"/>
+        <remove-dir name="$languagedir/ZebrumImport"/>
         <remove-file name="$sourcedir/Mod-ZebrumImport.php"/>
         <code>hooks.php</code>
     </uninstall>

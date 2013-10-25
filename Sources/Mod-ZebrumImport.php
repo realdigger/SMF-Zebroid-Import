@@ -12,7 +12,7 @@ if (!defined('SMF'))
 
 /**
  * Add mod admin area
- * @param array $admin_areas array of current areas
+ * @param array $admin_areas current admin areas
  */
 function addZebrumAdminArea(&$admin_areas)
 {
@@ -40,6 +40,7 @@ function addZebrumSettings($return_config = false)
     global $txt, $scripturl, $context, $cachedir, $sourcedir, $cat_tree;
     require_once($sourcedir . '/Subs-Boards.php');
 
+    $config_vars = array();
     $context['page_title'] = $txt['zebrum_import'];
     $context['settings_message'] = '';
     $context['zebrum_message'] = '';
@@ -58,7 +59,7 @@ function addZebrumSettings($return_config = false)
     }
 
 
-    if (is_uploaded_file($_FILES['zebrum_file']['tmp_name'])) {
+    if (isset($_FILES['zebrum_file']) && is_uploaded_file($_FILES['zebrum_file']['tmp_name'])) {
         checkSession();
         if (move_uploaded_file($_FILES['zebrum_file']['tmp_name'], $cachedir . '/' . md5($_FILES['zebrum_file']['name']))) {
             redirectexit('action=admin;area=modsettings;sa=zebrum_import;file=' . md5($_FILES['zebrum_file']['name']) . ';' . $context['session_var'] . '=' . $context['session_id']);
@@ -120,12 +121,13 @@ function addZebrumSettings($return_config = false)
     }
 
     if ($context['zebrum_message']) $context['settings_message'] .= $context['zebrum_message'];
+    prepareDBSettingContext($config_vars);
 }
 
 /**
- * Test Zebrum xml file and return count of objects
+ * Test Zebrum xml file and return count of items
  * @param string $file loaded xml file name
- * @return array|bool count of objects or false
+ * @return array|bool count of items or false
  */
 function testZebrumFile($file = '')
 {
@@ -151,7 +153,7 @@ function testZebrumFile($file = '')
  * @param string $file loaded xml file name
  * @param int $categoryID default category id
  * @param bool $clearHtml remove html tags flag
- * @return int|bool count of imported objects or false
+ * @return int|bool count of processed items or false
  */
 function importZebrumFile($file = '', $categoryID = 1, $clearHtml = true)
 {
@@ -185,14 +187,11 @@ function importZebrumFile($file = '', $categoryID = 1, $clearHtml = true)
         $result['posts'][] = importZebrumPost($post, $result['users'][(string)$post->author], $result['topics'][(int)$post->parent_id]['board_id'], $result['topics'][(int)$post->parent_id]['id'], $clearHtml);
     }
 
-    // Update stats & cache
+    // Update stats, clean cache and remove uploaded file
     clean_cache();
     updateStats('message');
     updateStats('topic');
     updateStats('member');
-
-    // Xml file not needed anymore
-    unlink($cachedir . '/' . $file);
 
     if ($result) {
         $result['users'] = count($result['users']);
@@ -218,7 +217,7 @@ function importZebrumUser($user = '')
     $username = mb_split('@', $user->email);
     $username = mb_substr($username[0], 0, 24, 'UTF-8');
 
-    // Check if the email or username is in use.
+    // Check if the email or username is in use already.
     $request = $smcFunc['db_query']('', '
 		SELECT id_member
 		FROM {db_prefix}members
@@ -317,10 +316,11 @@ function importZebrumBoard($board = '', $categoryID = 1)
 /**
  * Import post from Zebrum xml object
  * @param string $post post object
- * @param array $author author's nick & email
+ * @param array $author author's nick and email
  * @param int $boardID board id
  * @param int $topicID topic id (if topicID=0 create new topic)
- * @return bool|int new topic id
+ * @param bool $clearHtml remove html tags flag
+ * @return bool|int new topic id to bool result
  */
 function importZebrumPost($post = '', $author = array(), $boardID = 0, $topicID = 0, $clearHtml = true)
 {
