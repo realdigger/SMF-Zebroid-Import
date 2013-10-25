@@ -1,0 +1,6 @@
+[center][b]Zebroid Import[/b][/center]
+
+
+Mod to import data from the [url=http://zebroid.ru]Zebroid[/url] software.
+Mod author: [url=http://mysmf.ru]digger[/url] © 2013
+License: CC BY-NC-ND [url]http://creativecommons.org/licenses/by-nc-nd/3.0/[/url]

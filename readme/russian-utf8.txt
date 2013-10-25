@@ -1,0 +1,5 @@
+[center][b]Zebroid Import[/b][/center]
+
+Мод предназначен для импорта данных из программы [url=http://zebroid.ru]Zebroid[/url].
+Автор мода: [url=http://mysmf.ru]digger[/url] © 2013
+Лицензия: CC BY-NC-ND [url]http://creativecommons.org/licenses/by-nc-nd/3.0/[/url]
