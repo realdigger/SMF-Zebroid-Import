@@ -1,6 +1,6 @@
 <?php
 /**
- * @package SMF Zebrum Import
+ * @package SMF Zebroid Import
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
@@ -14,73 +14,73 @@ if (!defined('SMF'))
  * Add mod admin area
  * @param array $admin_areas current admin areas
  */
-function addZebrumAdminArea(&$admin_areas)
+function addZebroidAdminArea(&$admin_areas)
 {
     global $txt;
-    loadLanguage('ZebrumImport/');
+    loadLanguage('ZebroidImport/');
 
-    $admin_areas['config']['areas']['modsettings']['subsections']['zebrum_import'] = array($txt['zebrum_import']);
+    $admin_areas['config']['areas']['modsettings']['subsections']['zebroid_import'] = array($txt['zebroid_import']);
 }
 
 /**
  * Add mod admin action
  * @param array $subActions current admin subactions
  */
-function addZebrumAdminAction(&$subActions)
+function addZebroidAdminAction(&$subActions)
 {
-    $subActions['zebrum_import'] = 'addZebrumSettings';
+    $subActions['zebroid_import'] = 'addZebroidSettings';
 }
 
 /**
  * Mod settings area
  * @param bool $return_config config vars
  */
-function addZebrumSettings($return_config = false)
+function addZebroidSettings($return_config = false)
 {
     global $txt, $scripturl, $context, $cachedir, $sourcedir, $cat_tree;
     require_once($sourcedir . '/Subs-Boards.php');
 
     $config_vars = array();
-    $context['page_title'] = $txt['zebrum_import'];
+    $context['page_title'] = $txt['zebroid_import'];
     $context['settings_message'] = '';
-    $context['zebrum_message'] = '';
+    $context['zebroid_message'] = '';
 
-    if (isset($_GET['message']) && !empty($_GET['message'])) $context['zebrum_message'] = handleZebrumImportMessage($_GET['message']);
+    if (isset($_GET['message']) && !empty($_GET['message'])) $context['zebroid_message'] = handleZebroidImportMessage($_GET['message']);
 
     if (empty($_GET['file']) && !isset($_GET['import_file'])) {
-        if (empty($context['zebrum_message'])) $context['zebrum_message'] = $txt['zebrum_file_load_desc'];
+        if (empty($context['zebroid_message'])) $context['zebroid_message'] = $txt['zebroid_file_load_desc'];
 
-        $context['settings_title'] = $txt['zebrum_title_load'];
+        $context['settings_title'] = $txt['zebroid_title_load'];
         $context['settings_message'] = '
-            <input type="file" name="zebrum_file" size="38" class="input_file" />
+            <input type="file" name="zebroid_file" size="38" class="input_file" />
             <input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '"/>';
-        $txt['save'] = $txt['zebrum_button_load'];
-        $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebrum_import" method="post" enctype="multipart/form-data';
+        $txt['save'] = $txt['zebroid_button_load'];
+        $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebroid_import" method="post" enctype="multipart/form-data';
     }
 
 
-    if (isset($_FILES['zebrum_file']) && is_uploaded_file($_FILES['zebrum_file']['tmp_name'])) {
+    if (isset($_FILES['zebroid_file']) && is_uploaded_file($_FILES['zebroid_file']['tmp_name'])) {
         checkSession();
-        if (move_uploaded_file($_FILES['zebrum_file']['tmp_name'], $cachedir . '/' . md5($_FILES['zebrum_file']['name']))) {
-            redirectexit('action=admin;area=modsettings;sa=zebrum_import;file=' . md5($_FILES['zebrum_file']['name']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+        if (move_uploaded_file($_FILES['zebroid_file']['tmp_name'], $cachedir . '/' . md5($_FILES['zebroid_file']['name']))) {
+            redirectexit('action=admin;area=modsettings;sa=zebroid_import;file=' . md5($_FILES['zebroid_file']['name']) . ';' . $context['session_var'] . '=' . $context['session_id']);
         } else {
-            redirectexit('action=admin;area=modsettings;sa=zebrum_import;message=load_error');
+            redirectexit('action=admin;area=modsettings;sa=zebroid_import;message=load_error');
         }
     }
 
     // Test xml file
     if (isset($_GET['file']) && !empty($_GET['file'])) {
-        $test = testZebrumFile($_GET['file']);
+        $test = testZebroidFile($_GET['file']);
         if ($test) {
-            $context['zebrum_message'] = $txt['zebrum_file_test_success'] . '<br />' .
-                $txt['zebrum_users'] . ': ' . $test['users'] . '<br />' .
-                $txt['zebrum_posts'] . ': ' . $test['posts'] . '<br />' .
-                $txt['zebrum_topics'] . ': ' . $test['topics'] . '<br />' .
-                $txt['zebrum_boards'] . ': ' . $test['boards'] . '<br />';
+            $context['zebroid_message'] = $txt['zebroid_file_test_success'] . '<br />' .
+                $txt['zebroid_users'] . ': ' . $test['users'] . '<br />' .
+                $txt['zebroid_posts'] . ': ' . $test['posts'] . '<br />' .
+                $txt['zebroid_topics'] . ': ' . $test['topics'] . '<br />' .
+                $txt['zebroid_boards'] . ': ' . $test['boards'] . '<br />';
 
             // Generate categories list for select
             getBoardTree();
-            if (empty($cat_tree)) redirectexit('action=admin;area=modsettings;sa=zebrum_import;message=no_categories_error');
+            if (empty($cat_tree)) redirectexit('action=admin;area=modsettings;sa=zebroid_import;message=no_categories_error');
             $selectCategory = '<select name="category_id">';
             foreach ($cat_tree as $categoryID => $category) {
                 $selectCategory .= '
@@ -88,48 +88,48 @@ function addZebrumSettings($return_config = false)
             }
             $selectCategory .= '/<select>';
 
-            $context['settings_title'] = $txt['zebrum_title_import'];
-            $context['zebrum_message'] .= '
+            $context['settings_title'] = $txt['zebroid_title_import'];
+            $context['zebroid_message'] .= '
                 <input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '"/>
                 <fieldset>
-                    <legend>' . $txt['zebrum_import_options'] . '</legend>' .
-                $txt['zebrum_default_category'] . '&nbsp;' . $selectCategory . '<br />' .
-                $txt['zebrum_clear_html'] . '<input type="checkbox" name="zebrum_clear_html" value="checked" checked />
+                    <legend>' . $txt['zebroid_import_options'] . '</legend>' .
+                $txt['zebroid_default_category'] . '&nbsp;' . $selectCategory . '<br />' .
+                $txt['zebroid_clear_html'] . '<input type="checkbox" name="zebroid_clear_html" value="checked" checked />
                 </fieldset>';
-            $txt['save'] = $txt['zebrum_button_import'];
-            $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebrum_import;import_file=' . $_GET['file'];
+            $txt['save'] = $txt['zebroid_button_import'];
+            $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebroid_import;import_file=' . $_GET['file'];
         } else {
             unlink($cachedir . '/' . $_GET['file']);
-            redirectexit('action=admin;area=modsettings;sa=zebrum_import;message=test_error');
+            redirectexit('action=admin;area=modsettings;sa=zebroid_import;message=test_error');
         }
     }
 
     // Import xml file
     if (isset($_GET['import_file'])) {
         checkSession();
-        $result = importZebrumFile($_GET['import_file'], (!empty($_POST['category_id']) ? $_POST['category_id'] : ''), (!empty($_POST['zebrum_clear_html']) ? true : false));
+        $result = importZebroidFile($_GET['import_file'], (!empty($_POST['category_id']) ? $_POST['category_id'] : ''), (!empty($_POST['zebroid_clear_html']) ? true : false));
         if ($result) {
-            $context['zebrum_message'] = $txt['zebrum_file_import_success'] . '<br />' .
-                $txt['zebrum_users'] . ': ' . $result['users'] . '<br />' .
-                $txt['zebrum_posts'] . ': ' . $result['posts'] . '<br />' .
-                $txt['zebrum_topics'] . ': ' . $result['topics'] . '<br />' .
-                $txt['zebrum_boards'] . ': ' . $result['boards'] . '<br />';
-            $txt['save'] = $txt['zebrum_button_success'];
-            $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebrum_import';
+            $context['zebroid_message'] = $txt['zebroid_file_import_success'] . '<br />' .
+                $txt['zebroid_users'] . ': ' . $result['users'] . '<br />' .
+                $txt['zebroid_posts'] . ': ' . $result['posts'] . '<br />' .
+                $txt['zebroid_topics'] . ': ' . $result['topics'] . '<br />' .
+                $txt['zebroid_boards'] . ': ' . $result['boards'] . '<br />';
+            $txt['save'] = $txt['zebroid_button_success'];
+            $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebroid_import';
         } else
-            redirectexit('action=admin;area=modsettings;sa=zebrum_import;message=import_error');
+            redirectexit('action=admin;area=modsettings;sa=zebroid_import;message=import_error');
     }
 
-    if ($context['zebrum_message']) $context['settings_message'] .= $context['zebrum_message'];
+    if ($context['zebroid_message']) $context['settings_message'] .= $context['zebroid_message'];
     prepareDBSettingContext($config_vars);
 }
 
 /**
- * Test Zebrum xml file and return count of items
+ * Test Zebroid xml file and return count of items
  * @param string $file loaded xml file name
  * @return array|bool count of items or false
  */
-function testZebrumFile($file = '')
+function testZebroidFile($file = '')
 {
     global $cachedir;
     $result = array();
@@ -149,13 +149,13 @@ function testZebrumFile($file = '')
 }
 
 /**
- * Import data from xml Zebrum xml file
+ * Import data from xml Zebroid xml file
  * @param string $file loaded xml file name
  * @param int $categoryID default category id
  * @param bool $clearHtml remove html tags flag
  * @return int|bool count of processed items or false
  */
-function importZebrumFile($file = '', $categoryID = 1, $clearHtml = true)
+function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true)
 {
     global $cachedir;
     $result = array();
@@ -167,24 +167,24 @@ function importZebrumFile($file = '', $categoryID = 1, $clearHtml = true)
 
     // Import users
     foreach ($xml->channel->user as $user) {
-        $result['users'][(string)$user->name]['id'] = importZebrumUser($user);
+        $result['users'][(string)$user->name]['id'] = importZebroidUser($user);
         $result['users'][(string)$user->name]['email'] = $user->email;
     }
 
     // Import boards
     foreach ($xml->channel->forum as $board) {
-        $result['boards'][(int)$board->id]['id'] = importZebrumBoard($board, $categoryID);
+        $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID);
     }
 
     // Import topics
     foreach ($xml->channel->topic as $topic) {
-        $result['topics'][(int)$topic->id]['id'] = importZebrumPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
+        $result['topics'][(int)$topic->id]['id'] = importZebroidPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
         $result['topics'][(int)$topic->id]['board_id'] = $result['boards'][(int)$topic->parent_id]['id'];
     }
 
     // Import posts
     foreach ($xml->channel->post as $post) {
-        $result['posts'][] = importZebrumPost($post, $result['users'][(string)$post->author], $result['topics'][(int)$post->parent_id]['board_id'], $result['topics'][(int)$post->parent_id]['id'], $clearHtml);
+        $result['posts'][] = importZebroidPost($post, $result['users'][(string)$post->author], $result['topics'][(int)$post->parent_id]['board_id'], $result['topics'][(int)$post->parent_id]['id'], $clearHtml);
     }
 
     // Update stats, clean cache and remove uploaded file
@@ -204,11 +204,11 @@ function importZebrumFile($file = '', $categoryID = 1, $clearHtml = true)
 }
 
 /**
- * Import user from Zebrum xml object
+ * Import user from Zebroid xml object
  * @param string $user user object
  * @return bool|int new or current user id
  */
-function importZebrumUser($user = '')
+function importZebroidUser($user = '')
 {
     global $sourcedir, $smcFunc;
     if (!$user) return false;
@@ -264,12 +264,12 @@ function importZebrumUser($user = '')
 }
 
 /**
- * Import board from Zebrum xml object
+ * Import board from Zebroid xml object
  * @param string $board board object
  * @param int $categoryID default category id
  * @return bool|int new or current board id
  */
-function importZebrumBoard($board = '', $categoryID = 1)
+function importZebroidBoard($board = '', $categoryID = 1)
 {
     global $sourcedir, $smcFunc;
     if (!$board) return false;
@@ -314,7 +314,7 @@ function importZebrumBoard($board = '', $categoryID = 1)
 }
 
 /**
- * Import post from Zebrum xml object
+ * Import post from Zebroid xml object
  * @param string $post post object
  * @param array $author author's nick and email
  * @param int $boardID board id
@@ -322,7 +322,7 @@ function importZebrumBoard($board = '', $categoryID = 1)
  * @param bool $clearHtml remove html tags flag
  * @return bool|int new topic id to bool result
  */
-function importZebrumPost($post = '', $author = array(), $boardID = 0, $topicID = 0, $clearHtml = true)
+function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID = 0, $clearHtml = true)
 {
     global $sourcedir, $smcFunc;
     if (!$post) return false;
@@ -363,7 +363,7 @@ function importZebrumPost($post = '', $author = array(), $boardID = 0, $topicID 
  * @param string $message message var
  * @return bool|string error/info message text or false
  */
-function handleZebrumImportMessage($message = '')
+function handleZebroidImportMessage($message = '')
 {
     global $txt, $context;
 
@@ -371,17 +371,17 @@ function handleZebrumImportMessage($message = '')
 
     switch ($message) {
         case 'load_error':
-            return $txt['zebrum_file_load_error'];
+            return $txt['zebroid_file_load_error'];
         case 'test_success':
-            return $txt['zebrum_file_test_success'];
+            return $txt['zebroid_file_test_success'];
         case 'test_error':
-            return $txt['zebrum_file_test_error'];
+            return $txt['zebroid_file_test_error'];
         case 'no_categories_error':
-            return $txt['zebrum_no_categories_error'];
+            return $txt['zebroid_no_categories_error'];
         case 'import_success':
-            return $txt['zebrum_file_import_success'];
+            return $txt['zebroid_file_import_success'];
         case 'import_error':
-            return $txt['zebrum_file_import_error'];
+            return $txt['zebroid_file_import_error'];
         default:
             return false;
     }

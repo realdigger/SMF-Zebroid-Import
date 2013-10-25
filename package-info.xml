@@ -2,8 +2,8 @@
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
 <package-info xmlns="http://www.simplemachines.org/xml/package-info">
 
-    <id>digger:zebrum_import</id>
-    <name>Zebrum import</name>
+    <id>digger:zebroid_import</id>
+    <name>Zebroid import</name>
     <type>modification</type>
     <version>1.0</version>
     <homepage>http://mysmf.ru</homepage>
@@ -12,12 +12,12 @@
         <require-dir name="Themes" destination="$boarddir"/>
         <require-dir name="Sources" destination="$boarddir"/>
         <code>hooks.php</code>
-        <redirect url="?action=admin;area=modsettings;sa=zebrum_import"/>
+        <redirect url="?action=admin;area=modsettings;sa=zebroid_import"/>
     </install>
 
     <uninstall for="2.0 - 2.0.99">
-        <remove-dir name="$languagedir/ZebrumImport"/>
-        <remove-file name="$sourcedir/Mod-ZebrumImport.php"/>
+        <remove-dir name="$languagedir/ZebroidImport"/>
+        <remove-file name="$sourcedir/Mod-ZebroidImport.php"/>
         <code>hooks.php</code>
     </uninstall>
 

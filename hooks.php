@@ -1,6 +1,6 @@
 <?php
 /**
- * @package SMF Zebrum Import
+ * @package SMF Zebroid Import
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
@@ -23,9 +23,9 @@ else
     $call = 'add_integration_function';
 
 $hooks = array(
-    'integrate_pre_include' => '$sourcedir/Mod-ZebrumImport.php',
-    'integrate_admin_areas' => 'addZebrumAdminArea',
-    'integrate_modify_modifications' => 'addZebrumAdminAction',
+    'integrate_pre_include' => '$sourcedir/Mod-ZebroidImport.php',
+    'integrate_admin_areas' => 'addZebroidAdminArea',
+    'integrate_modify_modifications' => 'addZebroidAdminAction',
 );
 
 foreach ($hooks as $hook => $function)

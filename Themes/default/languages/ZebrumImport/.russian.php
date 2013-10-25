@@ -1,32 +1,32 @@
 <?php
 /**
- * @package SMF Zebrum Import
+ * @package SMF Zebroid Import
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
  * @version 1.0
  */
 
-$txt['zebrum_import'] = 'Импорт из Zebrum';
-$txt['zebrum_import_options'] = 'Опции импорта';
-$txt['zebrum_title_load'] = 'Загрузка файла';
-$txt['zebrum_title_import'] = 'Импорт файла';
-$txt['zebrum_button_load'] = 'Загрузить файл';
-$txt['zebrum_button_import'] = 'Импортировать';
-$txt['zebrum_button_success'] = 'Готово';
-$txt['zebrum_clear_html'] = 'Удалять html тэги (кроме переноса строк) в сообщениях при импорте';
-$txt['zebrum_default_category'] = 'Категория по умолчанию (для создания новых разделов)';
-$txt['zebrum_no_categories_error'] = '<div class="error">На форуме нет ни одной категории! Невозможно произвести импорт.</div>';
-$txt['zebrum_file_load_error'] = '<div class="error">Ошибка загрузки файла!</div>';
-$txt['zebrum_file_load_desc'] = '<div>Выберите файл для загрузки.<p><fieldset><legend>Советы</legend>При замеченных расхождениях реальных данных со статистикой форума рекомендуется произвести пересчет статистики в <a href="index.php?action=admin;area=maintain">обслуживании форума</a>.<br />Рекомендуется использование мода <a href="http://custom.simplemachines.org/mods/index.php?mod=3456" target="_blank">Gravatar 4 SMF</a> для генерации аватаров пользователей.<br /></fieldset></div>';
-$txt['zebrum_file_test_error'] = '<div class="error">Ошибка проверки файла! Возможно, неверная xml-структура.</div>';
-$txt['zebrum_file_test_success'] = '<div class="success">Структура загруженного файла верна.</div>Файл содержит:';
-$txt['zebrum_file_import_error'] = '<div class="error">Ошибка импорта файла!</div>';
-$txt['zebrum_file_import_success'] = '<div class="success">Файл успешно импортирован.</div>Обработано:';
-$txt['zebrum_users'] = 'Пользователей';
-$txt['zebrum_posts'] = 'Сообщений';
-$txt['zebrum_topics'] = 'Тем';
-$txt['zebrum_boards'] = 'Разделов';
+$txt['zebroid_import'] = 'пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Zebroid';
+$txt['zebroid_import_options'] = 'пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_title_load'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_title_import'] = 'пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_button_load'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ';
+$txt['zebroid_button_import'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_button_success'] = 'пїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_clear_html'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅ html пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_default_category'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)';
+$txt['zebroid_no_categories_error'] = '<div class="error">пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</div>';
+$txt['zebroid_file_load_error'] = '<div class="error">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!</div>';
+$txt['zebroid_file_load_desc'] = '<div>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.<p><fieldset><legend>пїЅпїЅпїЅпїЅпїЅпїЅ</legend>пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ <a href="index.php?action=admin;area=maintain">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</a>.<br />пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ <a href="http://custom.simplemachines.org/mods/index.php?mod=3456" target="_blank">Gravatar 4 SMF</a> пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.<br /></fieldset></div>';
+$txt['zebroid_file_test_error'] = '<div class="error">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ xml-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</div>';
+$txt['zebroid_file_test_success'] = '<div class="success">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</div>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:';
+$txt['zebroid_file_import_error'] = '<div class="error">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!</div>';
+$txt['zebroid_file_import_success'] = '<div class="success">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</div>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:';
+$txt['zebroid_users'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_posts'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+$txt['zebroid_topics'] = 'пїЅпїЅпїЅ';
+$txt['zebroid_boards'] = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
 
 
 
