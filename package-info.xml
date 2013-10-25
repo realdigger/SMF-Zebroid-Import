@@ -9,6 +9,9 @@
     <homepage>http://mysmf.ru</homepage>
 
     <install for="2.0 - 2.0.99">
+        <readme parsebbc="true">readme/english.txt</readme>
+        <readme parsebbc="true" lang="russian">readme/russian.txt</readme>
+        <readme parsebbc="true" lang="russian-utf8">readme/russian-utf8.txt</readme>
         <require-dir name="Themes" destination="$boarddir"/>
         <require-dir name="Sources" destination="$boarddir"/>
         <code>hooks.php</code>

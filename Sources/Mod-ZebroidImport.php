@@ -247,6 +247,7 @@ function importZebroidUser($user = '')
         'check_email_ban' => false,
         'send_welcome_email' => false,
         'memberGroup' => 0,
+        'require' => 'nothing',
     );
     $regOptions['extra_register_vars'] = array(
         'real_name' => mb_eregi_replace('_', ' ', mb_substr($user->name, 0, 199, 'UTF-8')),
