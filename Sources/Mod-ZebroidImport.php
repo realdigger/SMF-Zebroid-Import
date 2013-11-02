@@ -4,7 +4,7 @@
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
- * @version 1.0
+ * @version 1.1
  */
 
 if (!defined('SMF'))
@@ -32,7 +32,7 @@ function addZebroidAdminAction(&$subActions)
 }
 
 /**
- * Mod settings area
+ * Mod working area
  * @param bool $return_config config vars
  */
 function addZebroidSettings($return_config = false)
@@ -74,9 +74,9 @@ function addZebroidSettings($return_config = false)
         if ($test) {
             $context['zebroid_message'] = $txt['zebroid_file_test_success'] . '<br />' .
                 $txt['zebroid_users'] . ': ' . $test['users'] . '<br />' .
-                $txt['zebroid_posts'] . ': ' . $test['posts'] . '<br />' .
+                $txt['zebroid_boards'] . ': ' . $test['boards'] . '<br />' .
                 $txt['zebroid_topics'] . ': ' . $test['topics'] . '<br />' .
-                $txt['zebroid_boards'] . ': ' . $test['boards'] . '<br />';
+                $txt['zebroid_posts'] . ': ' . $test['posts'] . '<br />';
 
             // Generate categories list for select
             getBoardTree();
@@ -111,9 +111,9 @@ function addZebroidSettings($return_config = false)
         if ($result) {
             $context['zebroid_message'] = $txt['zebroid_file_import_success'] . '<br />' .
                 $txt['zebroid_users'] . ': ' . $result['users'] . '<br />' .
-                $txt['zebroid_posts'] . ': ' . $result['posts'] . '<br />' .
+                $txt['zebroid_boards'] . ': ' . $result['boards'] . '<br />' .
                 $txt['zebroid_topics'] . ': ' . $result['topics'] . '<br />' .
-                $txt['zebroid_boards'] . ': ' . $result['boards'] . '<br />';
+                $txt['zebroid_posts'] . ': ' . $result['posts'] . '<br />';
             $txt['save'] = $txt['zebroid_button_success'];
             $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebroid_import';
         } else
@@ -132,17 +132,19 @@ function addZebroidSettings($return_config = false)
 function testZebroidFile($file = '')
 {
     global $cachedir;
-    $result = array();
     ini_set('max_execution_time', '600');
     set_time_limit(600);
 
     $xml = simplexml_load_file($cachedir . '/' . $file);
-    if (empty($xml)) return false;
+    if (!$xml) return false;
 
-    $result['users'] = count($xml->channel->user);
-    $result['posts'] = count($xml->channel->post);
-    $result['topics'] = count($xml->channel->topic);
-    $result['boards'] = count($xml->channel->forum);
+    $result = array();
+    $result['users'] = count($xml->users->user);
+    $result['boards'] = count($xml->forums->forum);
+    $result['topics'] = count($xml->items->topic);
+    $result['posts'] = 0;
+    foreach ($xml->items->topic as $topic)
+        $result['posts'] = $result['posts'] += count($topic->post);
 
     if ($result) return $result;
     else return false;
@@ -166,25 +168,24 @@ function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true)
     if (empty($xml)) return false;
 
     // Import users
-    foreach ($xml->channel->user as $user) {
+    foreach ($xml->users->user as $user) {
         $result['users'][(string)$user->name]['id'] = importZebroidUser($user);
         $result['users'][(string)$user->name]['email'] = $user->email;
     }
 
     // Import boards
-    foreach ($xml->channel->forum as $board) {
+    foreach ($xml->forums->forum as $board) {
         $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID);
     }
 
-    // Import topics
-    foreach ($xml->channel->topic as $topic) {
-        $result['topics'][(int)$topic->id]['id'] = importZebroidPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
-        $result['topics'][(int)$topic->id]['board_id'] = $result['boards'][(int)$topic->parent_id]['id'];
-    }
+    // Import topics & posts
+    $topicID = 0;
+    foreach ($xml->items->topic as $topic) {
+        $result['topics'][++$topicID] = importZebroidPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
 
-    // Import posts
-    foreach ($xml->channel->post as $post) {
-        $result['posts'][] = importZebroidPost($post, $result['users'][(string)$post->author], $result['topics'][(int)$post->parent_id]['board_id'], $result['topics'][(int)$post->parent_id]['id'], $clearHtml);
+        foreach ($topic->post as $post) {
+            $result['posts'][] = importZebroidPost($post, $result['users'][(string)$post->author], $result['boards'][(int)$topic->parent_id]['id'], $result['topics'][$topicID], $clearHtml);
+        }
     }
 
     // Update stats, clean cache and remove uploaded file
@@ -226,13 +227,15 @@ function importZebroidUser($user = '')
 		LIMIT 1',
         array(
             'email_address' => (string)$user->email,
-            'username' => (string)$username,
+            'username' => convertZebroidUTF8((string)$username),
         )
     );
 
     if ($smcFunc['db_num_rows']($request) != 0) {
         list ($memberID) = $smcFunc['db_fetch_row']($request);
         $smcFunc['db_free_result']($request);
+
+        updateMemberData($memberID, array('last_login' => (int)$user->lastact,)); // Update last_login date for this user
 
         return (int)$memberID;
     }
@@ -250,7 +253,7 @@ function importZebroidUser($user = '')
         'require' => 'nothing',
     );
     $regOptions['extra_register_vars'] = array(
-        'real_name' => mb_eregi_replace('_', ' ', mb_substr($user->name, 0, 199, 'UTF-8')),
+        'real_name' => convertZebroidUTF8(mb_eregi_replace('_', ' ', mb_substr($user->name, 0, 199, 'UTF-8'))),
         'date_registered' => (int)$user->regdate,
         'is_activated' => 1,
         'last_login' => (int)$user->lastact,
@@ -284,7 +287,7 @@ function importZebroidBoard($board = '', $categoryID = 1)
 		WHERE name = {string:name}
 		LIMIT 1',
         array(
-            'name' => (string)$board->name,
+            'name' => convertZebroidUTF8((string)$board->name),
         )
     );
 
@@ -296,7 +299,7 @@ function importZebroidBoard($board = '', $categoryID = 1)
     }
 
     $boardOptions = array(
-        'board_name' => $board->name,
+        'board_name' => convertZebroidUTF8($board->name),
         'move_to' => 'bottom',
         'target_category' => $categoryID,
         'posts_count' => true,
@@ -315,7 +318,7 @@ function importZebroidBoard($board = '', $categoryID = 1)
 }
 
 /**
- * Import post from Zebroid xml object
+ * Import post/topic from Zebroid xml object
  * @param string $post post object
  * @param array $author author's nick and email
  * @param int $boardID board id
@@ -332,8 +335,8 @@ function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID
 
     if ($clearHtml) $post->text = strip_tags($post->text, '<br>');
     $msgOptions = array(
-        'body' => $smcFunc['db_escape_string']($post->text),
-        'subject' => $smcFunc['db_escape_string']($post->title),
+        'body' => convertZebroidUTF8($post->text),
+        'subject' => convertZebroidUTF8($post->title),
         'approved' => 1,
         'smileys_enabled' => true,
     );
@@ -351,6 +354,20 @@ function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID
     );
 
     $result = createPost($msgOptions, $topicOptions, $posterOptions);
+
+    // Update post time
+    $request = $smcFunc['db_query']('', '
+		UPDATE {db_prefix}messages
+		SET poster_time = {int:poster_time}
+		WHERE id_msg = {int:id_msg}
+		  AND id_topic = {int:id_topic}',
+        array(
+            'poster_time' => (int)strtotime($post->time),
+            'id_msg' => (int)$msgOptions['id'],
+            'id_topic' => (int)$topicOptions['id'],
+        )
+    );
+
     if ($result) {
         updateMemberData($author['id'], array('posts' => '+'));
         if ($topicOptions['id'] != 0) return $topicOptions['id'];
@@ -366,7 +383,7 @@ function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID
  */
 function handleZebroidImportMessage($message = '')
 {
-    global $txt, $context;
+    global $txt;
 
     if (!$message) return;
 
@@ -386,4 +403,17 @@ function handleZebroidImportMessage($message = '')
         default:
             return false;
     }
+}
+
+/**
+ * Convert text from utf-8 to cp1251 encoding for non utf8 forums
+ * @param $text input text
+ * @return string converted text, if needed.
+ */
+function convertZebroidUTF8($text)
+{
+    global $context;
+
+    if (empty($context['utf8'])) return iconv('UTF-8', 'CP1251//TRANSLIT', $text);
+    else return $text;
 }

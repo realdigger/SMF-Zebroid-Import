@@ -27,8 +27,3 @@ $txt['zebroid_users'] = 'Members';
 $txt['zebroid_posts'] = 'Messages';
 $txt['zebroid_topics'] = 'Topics';
 $txt['zebroid_boards'] = 'Boards';
-
-
-
-
- 

@@ -27,5 +27,3 @@ $txt['zebroid_users'] = 'Пользователей';
 $txt['zebroid_posts'] = 'Сообщений';
 $txt['zebroid_topics'] = 'Тем';
 $txt['zebroid_boards'] = 'Разделов';
-
-
