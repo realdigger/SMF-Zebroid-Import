@@ -4,7 +4,7 @@
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
- * @version 1.1
+ * @version 1.2
  */
 
 if (!defined('SMF'))
@@ -94,6 +94,7 @@ function addZebroidSettings($return_config = false)
                 <fieldset>
                     <legend>' . $txt['zebroid_import_options'] . '</legend>' .
                 $txt['zebroid_default_category'] . '&nbsp;' . $selectCategory . '<br />' .
+                $txt['zebroid_use_post_titles'] . '<input type="checkbox" name="zebroid_use_post_titles" value="checked" checked /><br />' .
                 $txt['zebroid_clear_html'] . '<input type="checkbox" name="zebroid_clear_html" value="checked" checked />
                 </fieldset>';
             $txt['save'] = $txt['zebroid_button_import'];
@@ -107,7 +108,12 @@ function addZebroidSettings($return_config = false)
     // Import xml file
     if (isset($_GET['import_file'])) {
         checkSession();
-        $result = importZebroidFile($_GET['import_file'], (!empty($_POST['category_id']) ? $_POST['category_id'] : ''), (!empty($_POST['zebroid_clear_html']) ? true : false));
+        $result = importZebroidFile(
+            $_GET['import_file'],
+            !empty($_POST['category_id']) ? $_POST['category_id'] : '',
+            !empty($_POST['zebroid_clear_html']) ? true : false,
+            !empty($_POST['zebroid_use_post_titles']) ? true : false
+        );
         if ($result) {
             $context['zebroid_message'] = $txt['zebroid_file_import_success'] . '<br />' .
                 $txt['zebroid_users'] . ': ' . $result['users'] . '<br />' .
@@ -155,11 +161,12 @@ function testZebroidFile($file = '')
  * @param string $file loaded xml file name
  * @param int $categoryID default category id
  * @param bool $clearHtml remove html tags flag
+ * @param bool $zebroid_use_post_titles use post titles
  * @return int|bool count of processed items or false
  */
-function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true)
+function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true, $zebroid_use_post_titles = true)
 {
-    global $cachedir;
+    global $cachedir, $txt;
     $result = array();
     ini_set('max_execution_time', '600');
     set_time_limit(600);
@@ -175,15 +182,24 @@ function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true)
 
     // Import boards
     foreach ($xml->forums->forum as $board) {
-        $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID);
+        if ($board->parent_id == -1)
+            $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID);
     }
 
-    // Import topics & posts
+    // Import subboards
+    foreach ($xml->forums->forum as $board) {
+        if ($board->parent_id != -1)
+            $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID, $result['boards'][(int)$board->parent_id]['id']);
+    }
+
+    // Import topics
     $topicID = 0;
     foreach ($xml->items->topic as $topic) {
         $result['topics'][++$topicID] = importZebroidPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
 
+        // Import posts
         foreach ($topic->post as $post) {
+            if (!$zebroid_use_post_titles) $post->title = $txt['response_prefix'] . $topic->title;
             $result['posts'][] = importZebroidPost($post, $result['users'][(string)$post->author], $result['boards'][(int)$topic->parent_id]['id'], $result['topics'][$topicID], $clearHtml);
         }
     }
@@ -271,9 +287,10 @@ function importZebroidUser($user = '')
  * Import board from Zebroid xml object
  * @param string $board board object
  * @param int $categoryID default category id
+ * @param int $boardParentID parent board id
  * @return bool|int new or current board id
  */
-function importZebroidBoard($board = '', $categoryID = 1)
+function importZebroidBoard($board = '', $categoryID = 1, $boardParentID = 0)
 {
     global $sourcedir, $smcFunc;
     if (!$board) return false;
@@ -287,7 +304,7 @@ function importZebroidBoard($board = '', $categoryID = 1)
 		WHERE name = {string:name}
 		LIMIT 1',
         array(
-            'name' => convertZebroidUTF8((string)$board->name),
+            'name' => convertZebroidUTF8($board->name),
         )
     );
 
@@ -299,8 +316,8 @@ function importZebroidBoard($board = '', $categoryID = 1)
     }
 
     $boardOptions = array(
-        'board_name' => convertZebroidUTF8($board->name),
-        'move_to' => 'bottom',
+        'board_name' => convertZebroidUTF8((string)$board->name),
+        'move_to' => $boardParentID ? 'child' : 'bottom',
         'target_category' => $categoryID,
         'posts_count' => true,
         'override_theme' => false,
@@ -312,6 +329,9 @@ function importZebroidBoard($board = '', $categoryID = 1)
         'inherit_permissions' => true,
         'dont_log' => true,
     );
+
+    // Board have a parent?
+    if ($boardParentID) $boardOptions['target_board'] = $boardParentID;
 
     $result = createBoard($boardOptions);
     if ($result) return (int)$result; else return false;
@@ -362,7 +382,7 @@ function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID
 		WHERE id_msg = {int:id_msg}
 		  AND id_topic = {int:id_topic}',
         array(
-            'poster_time' => (int)strtotime($post->time),
+            'poster_time' => (int)$post->time,
             'id_msg' => (int)$msgOptions['id'],
             'id_topic' => (int)$topicOptions['id'],
         )
