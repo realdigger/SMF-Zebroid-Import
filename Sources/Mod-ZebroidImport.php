@@ -4,7 +4,7 @@
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
- * @version 1.2
+ * @version 1.3
  */
 
 if (!defined('SMF'))
@@ -37,7 +37,8 @@ function addZebroidAdminAction(&$subActions)
  */
 function addZebroidSettings($return_config = false)
 {
-    global $txt, $scripturl, $context, $cachedir, $sourcedir, $cat_tree;
+    global $txt, $scripturl, $boarddir, $context, $cachedir, $sourcedir, $cat_tree;
+    $dirFtp = $boarddir . '/zebroid';
     require_once($sourcedir . '/Subs-Boards.php');
 
     $config_vars = array();
@@ -54,10 +55,12 @@ function addZebroidSettings($return_config = false)
         $context['settings_message'] = '
             <input type="file" name="zebroid_file" size="38" class="input_file" />
             <input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '"/>';
+
+        $context['settings_message'] .= getZebroidFilesList($dirFtp);
+
         $txt['save'] = $txt['zebroid_button_load'];
         $context['post_url'] = $scripturl . '?action=admin;area=modsettings;sa=zebroid_import" method="post" enctype="multipart/form-data';
     }
-
 
     if (isset($_FILES['zebroid_file']) && is_uploaded_file($_FILES['zebroid_file']['tmp_name'])) {
         checkSession();
@@ -70,6 +73,12 @@ function addZebroidSettings($return_config = false)
 
     // Test xml file
     if (isset($_GET['file']) && !empty($_GET['file'])) {
+        if (isset($_GET['ftp'])) {
+            $_GET['file'] = urldecode($_GET['file']);
+            if (copy($dirFtp . '/' . $_GET['file'], $cachedir . '/' . md5($_GET['file']))) {
+                $_GET['file'] = md5($_GET['file']);
+            } else redirectexit('action=admin;area=modsettings;sa=zebroid_import;message=test_error');
+        }
         $test = testZebroidFile($_GET['file']);
         if ($test) {
             $context['zebroid_message'] = $txt['zebroid_file_test_success'] . '<br />' .
@@ -139,6 +148,7 @@ function testZebroidFile($file = '')
 {
     global $cachedir;
     ini_set('max_execution_time', '600');
+    ini_set('memory_limit', '128M');
     set_time_limit(600);
 
     $xml = simplexml_load_file($cachedir . '/' . $file);
@@ -169,18 +179,21 @@ function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true, $zebr
     global $cachedir, $txt;
     $result = array();
     ini_set('max_execution_time', '600');
+    ini_set('memory_limit', '128M');
     set_time_limit(600);
 
     $xml = simplexml_load_file($cachedir . '/' . $file);
     if (empty($xml)) return false;
 
     // Import users
+    $result['users'] = array();
     foreach ($xml->users->user as $user) {
         $result['users'][(string)$user->name]['id'] = importZebroidUser($user);
         $result['users'][(string)$user->name]['email'] = $user->email;
     }
 
     // Import boards
+    $result['boards'] = array();
     foreach ($xml->forums->forum as $board) {
         if ($board->parent_id == -1)
             $result['boards'][(int)$board->id]['id'] = importZebroidBoard($board, $categoryID);
@@ -193,6 +206,8 @@ function importZebroidFile($file = '', $categoryID = 1, $clearHtml = true, $zebr
     }
 
     // Import topics
+    $result['topics'] = array();
+    $result['posts'] = array();
     $topicID = 0;
     foreach ($xml->items->topic as $topic) {
         $result['topics'][++$topicID] = importZebroidPost($topic, $result['users'][(string)$topic->author], $result['boards'][(int)$topic->parent_id]['id'], 0, $clearHtml);
@@ -231,8 +246,17 @@ function importZebroidUser($user = '')
     if (!$user) return false;
 
     require_once($sourcedir . '/Subs-Members.php');
-    $username = mb_split('@', $user->email);
-    $username = mb_substr($username[0], 0, 24, 'UTF-8');
+    require_once($sourcedir . '/Profile-Modify.php');
+
+    // Hash and cut user login
+    $username = md5($user->name);
+    $username = mb_substr($username, 0, 24, 'UTF-8');
+
+    // Check for correct email
+    if (empty($user->email) || profileValidateEmail($user->email) == 'bad_email') {
+        // Generate fake email
+        $user->email = $username . '@' . 'mail.local';
+    }
 
     // Check if the email or username is in use already.
     $request = $smcFunc['db_query']('', '
@@ -436,4 +460,27 @@ function convertZebroidUTF8($text)
 
     if (empty($context['utf8'])) return iconv('UTF-8', 'CP1251//TRANSLIT', $text);
     else return $text;
+}
+
+/**
+ * Return list of files in selected directory
+ * @param string $dirFtp directory name
+ * @return bool|string list of files
+ */
+function getZebroidFilesList($dirFtp = '')
+{
+    global $boarddir, $context;
+    $result = '';
+
+    if (!is_dir($dirFtp)) return false;
+
+    @chdir($dirFtp);
+    $list = glob('*.xml');
+    if (empty($list)) return false;
+
+    foreach ($list as $file) {
+        $result .= '<br /><a href="?action=admin;area=modsettings;sa=zebroid_import;ftp;file=' . urlencode($file) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $file . '</a>';
+    }
+
+    return $result;
 }
