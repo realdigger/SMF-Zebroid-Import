@@ -4,7 +4,7 @@
  * @author digger http://mysmf.ru
  * @copyright 2013
  * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
- * @version 1.3
+ * @version 1.4
  */
 
 if (!defined('SMF'))
@@ -372,9 +372,10 @@ function importZebroidBoard($board = '', $categoryID = 1, $boardParentID = 0)
  */
 function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID = 0, $clearHtml = true)
 {
-    global $sourcedir, $smcFunc;
+    global $modSettings, $sourcedir, $smcFunc;
     if (!$post) return false;
 
+    $modSettings['optimus_sitemap_enable'] = false; //Temorary disable Optimus Brave Sitemap
     require_once($sourcedir . '/Subs-Post.php');
 
     if ($clearHtml) $post->text = strip_tags($post->text, '<br>');
