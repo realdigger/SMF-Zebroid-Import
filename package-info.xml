@@ -5,17 +5,18 @@
     <id>digger:zebroid_import</id>
     <name>Zebroid import</name>
     <type>modification</type>
-    <version>1.4</version>
-    <homepage>http://mysmf.ru/zebroid</homepage>
+    <version>1.5</version>
+    <homepage>http://mysmf.ru/mods/zebroid-import</homepage>
 
     <install for="2.0 - 2.0.99">
         <readme parsebbc="true">readme/english.txt</readme>
+        <readme parsebbc="true">readme/english-utf8.txt</readme>
         <readme parsebbc="true" lang="russian">readme/russian.txt</readme>
         <readme parsebbc="true" lang="russian-utf8">readme/russian-utf8.txt</readme>
         <require-dir name="Themes" destination="$boarddir"/>
         <require-dir name="Sources" destination="$boarddir"/>
         <require-dir name="zebroid" destination="$boarddir"/>
-        <code>hooks.php</code>
+        <database>hooks.php</database>
         <redirect url="?action=admin;area=modsettings;sa=zebroid_import"/>
     </install>
 
@@ -23,7 +24,7 @@
         <remove-dir name="$languagedir/ZebroidImport"/>
         <remove-file name="$sourcedir/Mod-ZebroidImport.php"/>
         <remove-dir name="$boarddir/zebroid"/>
-        <code>hooks.php</code>
+        <database>hooks.php</database>
     </uninstall>
 
 </package-info>

@@ -2,8 +2,8 @@
 /**
  * @package SMF Zebroid Import
  * @author digger http://mysmf.ru
- * @copyright 2013
- * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
+ * @copyright 2013-2017
+ * @license The MIT License (MIT) https://opensource.org/licenses/MIT
  * @version 1.0
  */
 
@@ -24,8 +24,7 @@ else
 
 $hooks = array(
     'integrate_pre_include' => '$sourcedir/Mod-ZebroidImport.php',
-    'integrate_admin_areas' => 'addZebroidAdminArea',
-    'integrate_modify_modifications' => 'addZebroidAdminAction',
+    'integrate_pre_load' => 'loadZebroidHooks'
 );
 
 foreach ($hooks as $hook => $function)

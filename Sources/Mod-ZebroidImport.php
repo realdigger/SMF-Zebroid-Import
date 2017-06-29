@@ -2,13 +2,23 @@
 /**
  * @package SMF Zebroid Import
  * @author digger http://mysmf.ru
- * @copyright 2013
- * @license CC BY-NC-ND http://creativecommons.org/licenses/by-nc-nd/3.0/
- * @version 1.4
+ * @copyright 2013-2017
+ * @license The MIT License (MIT) https://opensource.org/licenses/MIT
+ * @version 1.5
  */
 
 if (!defined('SMF'))
     die('Hacking attempt...');
+
+/**
+ * Load all needed hooks
+ */
+function loadZebroidHooks()
+{
+    add_integration_function('integrate_admin_areas', 'addZebroidAdminArea', false);
+    add_integration_function('integrate_modify_modifications', 'addZebroidAdminAction', false);
+    add_integration_function('integrate_menu_buttons', 'addZebroidCopyright', false);
+}
 
 /**
  * Add mod admin area
@@ -375,7 +385,7 @@ function importZebroidPost($post = '', $author = array(), $boardID = 0, $topicID
     global $modSettings, $sourcedir, $smcFunc;
     if (!$post) return false;
 
-    $modSettings['optimus_sitemap_enable'] = false; //Temorary disable Optimus Brave Sitemap
+    $modSettings['optimus_sitemap_enable'] = false; //Temporary disable Optimus Brave Sitemap
     require_once($sourcedir . '/Subs-Post.php');
 
     if ($clearHtml) $post->text = strip_tags($post->text, '<br>');
@@ -470,7 +480,7 @@ function convertZebroidUTF8($text)
  */
 function getZebroidFilesList($dirFtp = '')
 {
-    global $boarddir, $context;
+    global $context;
     $result = '';
 
     if (!is_dir($dirFtp)) return false;
@@ -484,4 +494,16 @@ function getZebroidFilesList($dirFtp = '')
     }
 
     return $result;
+}
+
+/**
+ * Add mod copyright to the forum credit's page
+ */
+function addZebroidCopyright()
+{
+    global $context;
+
+    if ($context['current_action'] == 'credits') {
+        $context['copyrights']['mods'][] = '<a href="http://mysmf.ru/mods/zebroid-import" target="_blank">Zebroid Import</a> &copy; 2013-2017, digger';
+    }
 }
