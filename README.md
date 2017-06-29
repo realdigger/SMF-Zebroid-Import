@@ -2,6 +2,7 @@
 * **Author:** digger [http://mysmf.ru](http://mysmf.ru)
 * **License:** The MIT License (MIT) https://opensource.org/licenses/MIT
 * **Compatible with:** SMF 2.0
+* **Hooks Only:** Yes
 * **Languages:** English, Russian
 
 ## Installation  
