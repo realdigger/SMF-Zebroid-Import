@@ -5,7 +5,7 @@
     <id>digger:zebroid_import</id>
     <name>Zebroid import</name>
     <type>modification</type>
-    <version>1.5</version>
+    <version>1.5.1</version>
     <homepage>http://mysmf.ru/mods/zebroid-import</homepage>
 
     <install for="2.0 - 2.0.99">
